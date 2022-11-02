@@ -15,6 +15,7 @@ import NuevoPresupuesto from './src/components/NuevoPresupuesto'
 import ControlPresupuesto from './src/components/ControlPresupuesto';
 import FormularioGasto from './src/components/FormularioGasto';
 import ListadoGastos from './src/components/ListadoGastos';
+import Filtro from './src/components/Filtro';
 import { generarId } from './src/helpers'
 
 
@@ -24,6 +25,8 @@ const App = () => {
   const [gastos, setGastos] = useState([]);
   const [modalFormularioGasto, setModalFormularioGasto] = useState(false);
   const [gastoAux, setGastoAux] = useState({});
+  const [filtro, setFiltro] = useState('');
+  const [gastosFiltrados, setGastosFiltrados] = useState([]);
 
   const handleNuevoPresupuesto = ( presupuesto ) => {
     if(Number(presupuesto) > 0){
@@ -99,11 +102,22 @@ const App = () => {
         </View>
 
         { isValidPresupuesto && (
-          <ListadoGastos 
-            gastos={ gastos } 
-            setModalFormularioGasto={ setModalFormularioGasto }
-            setGastoAux={ setGastoAux }
-          />
+          <>
+            <Filtro 
+              filtro={ filtro } 
+              setFiltro={ setFiltro } 
+              gastos={ gastos }
+              setGastosFiltrados={ setGastosFiltrados }
+            />
+
+            <ListadoGastos 
+              gastos={ gastos } 
+              setModalFormularioGasto={ setModalFormularioGasto }
+              setGastoAux={ setGastoAux }
+              filtro={ filtro }
+              gastosFiltrados={ gastosFiltrados }
+            />
+          </>
         )}
 
       </ScrollView>

@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
   ScrollView,
   StyleSheet,
-  Text,
   Alert,
   Pressable,
   Image,
   Modal
 } from 'react-native';
+import AsyncStorage  from '@react-native-async-storage/async-storage'
 import Header from './src/components/Header'
 import NuevoPresupuesto from './src/components/NuevoPresupuesto'
 import ControlPresupuesto from './src/components/ControlPresupuesto';
@@ -27,6 +27,59 @@ const App = () => {
   const [gastoAux, setGastoAux] = useState({});
   const [filtro, setFiltro] = useState('');
   const [gastosFiltrados, setGastosFiltrados] = useState([]);
+
+  useEffect( () => {
+    const getPresupuestoStorage = async () => {
+      try {
+        const presupuestoStorage = await AsyncStorage.getItem('planificador_presupuesto');
+        //Number retorna 0 si parámetro es null
+        const formateado = Number(JSON.parse(presupuestoStorage));
+        if(formateado > 0){
+          setPresupuesto(formateado);
+          setIsValidPresupuesto(true);
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    getPresupuestoStorage();
+  }, [])
+
+  useEffect( () => {
+    if(isValidPresupuesto){
+      const setPresupuestoStorage = async () => {
+        try {
+          await AsyncStorage.setItem('planificador_presupuesto', JSON.stringify(presupuesto));
+        } catch (error) {
+          console.log(error)
+        }
+      }
+      setPresupuestoStorage();
+    }
+  }, [ isValidPresupuesto ])
+
+  useEffect( () => {
+    const getGastosStorage = async () => {
+      try {
+        const gastosStorage = await AsyncStorage.getItem('planificador_gastos');
+        setGastos( gastosStorage ? JSON.parse(gastosStorage) : [] )
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    getGastosStorage();
+  }, [])
+
+  useEffect( () => {
+    const setGastosStorage = async () => {
+      try {
+        await AsyncStorage.setItem('planificador_gastos', JSON.stringify(gastos));
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    setGastosStorage();
+  }, [ gastos ])
 
   const handleNuevoPresupuesto = ( presupuesto ) => {
     if(Number(presupuesto) > 0){
@@ -79,6 +132,26 @@ const App = () => {
     
   }
 
+  const resetApp = () => {
+    Alert.alert(
+      'Deseas resetear la app?', 
+      'Esto eliminará presupuesto y gastos.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Eliminar', onPress: async () => {
+          try {
+            await AsyncStorage.clear();
+            setIsValidPresupuesto(false);
+            setPresupuesto(0);
+            setGastos([]);
+          } catch (error) {
+            console.log(error)
+          }
+        }},
+      ]
+    )
+  }
+
   return (
     <SafeAreaView style={ styles.contenedor }>
 
@@ -91,6 +164,7 @@ const App = () => {
               presupuesto={ presupuesto }
               gastos={ gastos }
               setGastos={ setGastos }
+              resetApp={ resetApp }
             /> 
             : 
             <NuevoPresupuesto 

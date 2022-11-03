@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { Text, View, Image, StyleSheet } from 'react-native'
+import { Text, View, StyleSheet, Pressable } from 'react-native'
 import globalStyles from '../styles'
 import { formatearCantidadDolar }  from '../helpers'
 import CircularProgress from 'react-native-circular-progress-indicator' 
 
-const ControlPresupuesto = ({ presupuesto, gastos }) => {
+const ControlPresupuesto = ({ presupuesto, gastos, resetApp }) => {
     const [disponible, setDisponible] = useState(0);
     const [gastado, setGastado] = useState(0);
     const [porcentaje, setPorcentaje] = useState(0);
@@ -26,7 +26,6 @@ const ControlPresupuesto = ({ presupuesto, gastos }) => {
     return (
         <View style={ styles.contenedor }>
             <View style={ styles.centrarGrafica }>
-                {/* <Image style={ styles.imagen } source={ require('../img/grafico.jpg') }/> */}
                 <CircularProgress 
                     value={ porcentaje } 
                     duration={ 500 }
@@ -43,6 +42,10 @@ const ControlPresupuesto = ({ presupuesto, gastos }) => {
             </View>
 
             <View style={ styles.contenedorTexto }>
+                <Pressable style={ styles.btnReset } onLongPress={ resetApp }>
+                    <Text style={ styles.btnResetTexto } >Reiniciar App</Text>
+                </Pressable>
+
                 <Text style={ styles.valor }>
                     <Text style={ styles.label }>Presupuesto: {''}</Text>
                     { formatearCantidadDolar(presupuesto) }
@@ -70,12 +73,20 @@ const styles = StyleSheet.create({
     centrarGrafica: {
         alignItems: 'center'
     },
-    imagen: {
-        width: 250,
-        height: 250
-    },
     contenedorTexto: {
         marginTop: 50
+    },
+    btnReset: {
+        backgroundColor: '#DB2777',
+        padding: 10,
+        marginBottom: 40,
+        borderRadius: 5,
+    },
+    btnResetTexto: {
+        textAlign: 'center',
+        color: '#FFF',
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
     },
     valor: {
         fontSize: 24,
